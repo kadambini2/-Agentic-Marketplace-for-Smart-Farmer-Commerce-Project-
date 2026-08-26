@@ -64,7 +64,7 @@ def get_gemini_client():
     if not api_key:
         st.error("⚠️ Gemini API Key missing. Add GEMINI_API_KEY to Streamlit Secrets.")
         return None
-    return genai.Client(api_key=api_key)
+    return genai.Client(GEMINI_API_KEY = "AIzaSy...")
 
 # ---------------- NAVIGATION SIDEBAR ----------------
 with st.sidebar:
