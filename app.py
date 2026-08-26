@@ -1,6 +1,4 @@
-
-        
-       import os
+import os
 import time
 import pandas as pd
 import streamlit as st
@@ -395,3 +393,5 @@ elif nav_selection == "⚙️ Farm Profile Settings":
         if save:
             st.session_state.farm_data = {"location": loc, "crop": crp, "acreage": ac, "soil": sl, "budget": bg}
             st.success("✅ Farm Profile updated!")
+        
+        
