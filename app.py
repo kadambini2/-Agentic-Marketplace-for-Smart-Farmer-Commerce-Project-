@@ -2,7 +2,7 @@ import os
 import time
 import streamlit as st
 import pandas as pd
-from google import genai  # Official google-genai package import
+import google.generativeai as genai  # Robust standard import
 
 # Page Configuration
 st.set_page_config(
@@ -53,13 +53,14 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Safe Gemini Client Initialization
-def get_gemini_client():
+# Safe Gemini Initialization
+def configure_gemini():
     api_key = st.secrets.get("GEMINI_API_KEY") or os.environ.get("GEMINI_API_KEY")
     if not api_key:
         st.error("⚠️ Gemini API Key missing. Add GEMINI_API_KEY to your Streamlit secrets.")
-        return None
-    return genai.Client(GEMINI_API_KEY = "AIzaSy...")
+        return False
+    genai.configure(api_key=api_key)
+    return True
 
 # ---------------- NAVIGATION SIDEBAR ----------------
 with st.sidebar:
@@ -121,8 +122,7 @@ if nav_selection == "🤖 Agentic Advisor":
 
     with col_right:
         if run_agent:
-            client = get_gemini_client()
-            if client:
+            if configure_gemini():
                 status_box = st.status("🤖 Agent Executing Tasks...", expanded=True)
                 status_box.write("🔍 Scanning regional dealers in local radius...")
                 time.sleep(1)
@@ -147,11 +147,8 @@ if nav_selection == "🤖 Agentic Advisor":
                 3. **Net Savings Summary**.
                 """
                 
-                # Executing generate_content using the google-genai Client
-                response = client.models.generate_content(
-                    model="gemini-2.5-flash",
-                    contents=prompt
-                )
+                model = genai.GenerativeModel("gemini-1.5-flash")
+                response = model.generate_content(prompt)
                 
                 st.markdown(response.text)
                 if enable_voice:
