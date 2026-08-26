@@ -1,53 +1,155 @@
-import os
+
+        
+       import os
 import time
 import pandas as pd
 import streamlit as st
 
-# Page Configuration
+# ---------------- PAGE CONFIGURATION ----------------
 st.set_page_config(
-    page_title="AgriMitra AI | Autonomous Agri-Commerce",
+    page_title="AgriMitra AI | Autonomous Commerce Platform",
     page_icon="🌾",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS for Modern App UI/UX
+# ---------------- ADVANCED CUSTOM CSS (UI/UX OVERHAUL) ----------------
 st.markdown("""
     <style>
-    .stApp { background-color: #f8faf9; }
+    /* Global Typography & Background */
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
     
+    html, body, [class*="css"] {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    
+    .stApp {
+        background-color: #f8fafb;
+    }
+    
+    /* Hide Default Header Elements */
+    header[data-testid="stHeader"] {
+        background: transparent;
+    }
+    
+    /* Sidebar Polish */
     [data-testid="stSidebar"] {
-        background-color: #ffffff;
-        border-right: 1px solid #e0e0e0;
+        background-color: #ffffff !important;
+        border-right: 1px solid #e2e8f0;
+        padding-top: 1rem;
     }
     
-    .metric-card {
-        background: white;
-        padding: 20px;
-        border-radius: 12px;
-        border: 1px solid #e2e8f0;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-        margin-bottom: 15px;
+    /* Brand Styling */
+    .brand-container {
+        padding: 10px 5px 20px 5px;
     }
-    .metric-title { font-size: 0.85rem; color: #64748b; font-weight: 600; text-transform: uppercase; }
-    .metric-value { font-size: 1.8rem; font-weight: 700; color: #1e293b; margin: 5px 0; }
-    .badge-green { background: #dcfce7; color: #15803d; padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
-    .badge-blue { background: #dbeafe; color: #1e40af; padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
+    .brand-title {
+        font-size: 1.5rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #15803d 0%, #047857 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        letter-spacing: -0.5px;
+        margin: 0;
+    }
+    .brand-subtitle {
+        font-size: 0.8rem;
+        color: #64748b;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        margin-top: 4px;
+    }
+    
+    /* Hero Header Banner */
+    .hero-banner {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        border-radius: 16px;
+        padding: 24px 32px;
+        color: white;
+        margin-bottom: 24px;
+        box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.1);
+    }
+    .hero-banner h2 {
+        color: #ffffff;
+        font-weight: 700;
+        margin: 0 0 6px 0;
+        font-size: 1.6rem;
+    }
+    .hero-banner p {
+        color: #94a3b8;
+        margin: 0;
+        font-size: 0.95rem;
+    }
 
-    .brand-title { font-size: 1.8rem; font-weight: 800; color: #166534; margin: 0; }
-    .brand-subtitle { font-size: 0.95rem; color: #475569; }
+    /* Modern Metric Cards */
+    .glass-card {
+        background: #ffffff;
+        border-radius: 14px;
+        padding: 20px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.02), 0 1px 2px rgba(0,0,0,0.03);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .glass-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px -5px rgba(0,0,0,0.05);
+    }
+    .card-label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .card-val {
+        font-size: 1.75rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin: 6px 0;
+    }
     
+    /* Status Badges */
+    .pill-green {
+        display: inline-block;
+        background: #dcfce7;
+        color: #15803d;
+        padding: 3px 10px;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 700;
+    }
+    .pill-blue {
+        display: inline-block;
+        background: #dbeafe;
+        color: #1d4ed8;
+        padding: 3px 10px;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 700;
+    }
+    
+    /* Button Customization */
     .stButton > button {
-        background-color: #166534 !important;
+        background: linear-gradient(135deg, #166534 0%, #15803d 100%) !important;
         color: white !important;
-        border-radius: 8px !important;
+        border-radius: 10px !important;
         font-weight: 600 !important;
-        padding: 0.5rem 1rem !important;
+        padding: 0.6rem 1.2rem !important;
         border: none !important;
-        width: 100%;
+        box-shadow: 0 4px 6px -1px rgba(22, 101, 52, 0.2) !important;
+        transition: all 0.2s ease !important;
     }
     .stButton > button:hover {
-        background-color: #15803d !important;
+        box-shadow: 0 8px 15px -3px rgba(22, 101, 52, 0.35) !important;
+        transform: translateY(-1px);
+    }
+    
+    /* Table Styling */
+    div[data-testid="stTable"] table {
+        border-radius: 10px;
+        overflow: hidden;
+        border: 1px solid #e2e8f0;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -63,13 +165,18 @@ def run_ai_agent(prompt):
             response = model.generate_content(prompt)
             return response.text
         except Exception:
-            pass  # Fallback to internal simulation logic if SDK/key fails
+            pass
     return None
 
 # ---------------- NAVIGATION SIDEBAR ----------------
 with st.sidebar:
-    st.markdown('<div class="brand-title">🌾 AgriMitra AI</div>', unsafe_allow_html=True)
-    st.markdown('<div class="brand-subtitle">Autonomous Farm Commerce</div>', unsafe_allow_html=True)
+    st.markdown("""
+        <div class="brand-container">
+            <div class="brand-title">🌾 AgriMitra AI</div>
+            <div class="brand-subtitle">Autonomous Farm Commerce</div>
+        </div>
+    """, unsafe_allow_html=True)
+    
     st.divider()
 
     nav_selection = st.radio(
@@ -79,12 +186,12 @@ with st.sidebar:
     )
 
     st.divider()
-    st.markdown("##### 🌐 Voice & Localization")
+    st.markdown("##### 🌐 Preferences & Voice")
     language = st.selectbox("Preferred Language", ["English", "Hindi (हिंदी)", "Kannada (ಕನ್ನಡ)", "Telugu (తెలుగు)"])
     enable_voice = st.toggle("Enable Voice Advisory", value=True)
     
     st.divider()
-    st.caption("🟢 **Agent Node:** Online (v2.4-Production)")
+    st.caption("🟢 **Autonomous Engine:** Ready (v2.4 Pro)")
 
 # ---------------- SESSION STATE DATA ----------------
 if 'farm_data' not in st.session_state:
@@ -96,44 +203,79 @@ if 'farm_data' not in st.session_state:
         "budget": 35000
     }
 
-# Top Header Layout Across All Pages
-top_c1, top_c2, top_c3 = st.columns([2, 1, 1])
-with top_c1:
-    st.title(f"{nav_selection.split(' ')[1]} Overview")
-with top_c2:
-    st.markdown(f'<div class="metric-card"><div class="metric-title">Active Crop</div><div class="metric-value">{st.session_state.farm_data["crop"]}</div></div>', unsafe_allow_html=True)
-with top_c3:
-    st.markdown(f'<div class="metric-card"><div class="metric-title">Working Budget</div><div class="metric-value">₹{st.session_state.farm_data["budget"]:,}</div></div>', unsafe_allow_html=True)
+# ---------------- HERO BANNER & METRICS ----------------
+st.markdown(f"""
+    <div class="hero-banner">
+        <h2>Welcome back, Kadambini 👋</h2>
+        <p>Managing {st.session_state.farm_data['acreage']} Acres in {st.session_state.farm_data['location']} • Next harvest target: Pigeon Pea</p>
+    </div>
+""", unsafe_allow_html=True)
 
-st.divider()
+m1, m2, m3, m4 = st.columns(4)
+with m1:
+    st.markdown(f'''
+        <div class="glass-card">
+            <div class="card-label">Active Crop</div>
+            <div class="card-val" style="font-size: 1.3rem;">{st.session_state.farm_data["crop"]}</div>
+            <span class="pill-green">Optimal Season</span>
+        </div>
+    ''', unsafe_allow_html=True)
+with m2:
+    st.markdown(f'''
+        <div class="glass-card">
+            <div class="card-label">Allocated Budget</div>
+            <div class="card-val">₹{st.session_state.farm_data["budget"]:,}</div>
+            <span class="pill-blue">Active Balance</span>
+        </div>
+    ''', unsafe_allow_html=True)
+with m3:
+    st.markdown('''
+        <div class="glass-card">
+            <div class="card-label">Mandi Benchmark</div>
+            <div class="card-val">₹6,850</div>
+            <span class="pill-green">+4.2% Today</span>
+        </div>
+    ''', unsafe_allow_html=True)
+with m4:
+    st.markdown('''
+        <div class="glass-card">
+            <div class="card-label">Direct Buyer Offer</div>
+            <div class="card-val">₹7,200</div>
+            <span class="pill-blue">+5.1% Premium</span>
+        </div>
+    ''', unsafe_allow_html=True)
+
+st.markdown("<br>", unsafe_allow_html=True)
 
 # ---------------- PAGE 1: AGENTIC ADVISOR ----------------
 if nav_selection == "🤖 Agentic Advisor":
-    st.subheader("Autonomous Input Procurement & Budget Allocator")
-    st.write("Our AI Agent coordinates input vendors, calculates chemical quantities by acreage, and locks direct wholesale prices.")
+    st.subheader("🤖 Autonomous Input Procurement & Allocation")
+    st.caption("Our multi-agent system negotiates prices with verified local vendors, calculates precise dosage by acreage, and builds your custom procurement order.")
     
-    col_left, col_right = st.columns([1, 1])
+    c_left, c_right = st.columns([1, 1.2], gap="large")
     
-    with col_left:
-        st.markdown('<div class="metric-card">', unsafe_allow_html=True)
-        st.markdown("### 📋 Active Farm Parameters")
+    with c_left:
+        st.markdown('''
+            <div class="glass-card" style="margin-bottom: 20px;">
+                <h4 style="margin-top:0; color: #1e293b;">📋 Active Profile Parameters</h4>
+        ''', unsafe_allow_html=True)
         st.write(f"**Region:** {st.session_state.farm_data['location']}")
-        st.write(f"**Soil Condition:** {st.session_state.farm_data['soil']}")
+        st.write(f"**Soil Type:** {st.session_state.farm_data['soil']}")
         st.write(f"**Target Acreage:** {st.session_state.farm_data['acreage']} Acres")
-        st.write(f"**Language Selected:** {language}")
+        st.write(f"**Target Language:** {language}")
         st.markdown('</div>', unsafe_allow_html=True)
         
-        run_agent = st.button("🚀 Execute Autonomous Procurement Agent")
+        run_agent = st.button("🚀 Run Autonomous Procurement Agent", use_container_width=True)
 
-    with col_right:
+    with c_right:
         if run_agent:
-            status_box = st.status("🤖 Agent Executing Tasks...", expanded=True)
-            status_box.write("🔍 Scanning regional dealers in local radius...")
+            status_box = st.status("🤖 Agent Executing Autonomous Protocol...", expanded=True)
+            status_box.write("🔍 Requesting bids from 5 local authorized distributors...")
             time.sleep(1)
-            status_box.write("⚖️ Negotiating bulk volume pricing for bio-fertilizers...")
+            status_box.write("⚖️ Negotiating volume discounts for organic fertilizers...")
             time.sleep(1)
-            status_box.write("📦 Verifying soil NPK compatibility...")
-            status_box.update(label="✅ Agent Execution Complete!", state="complete", expanded=False)
+            status_box.write("📦 Verifying soil NPK compatibility matrix...")
+            status_box.update(label="✅ Autonomous Strategy Ready!", state="complete", expanded=False)
 
             prompt = f"""
             You are AgriMitra AI, an autonomous commerce agent for Indian farmers.
@@ -160,66 +302,79 @@ if nav_selection == "🤖 Agentic Advisor":
                 total_est = seed_cost + fert_cost + pest_cost
                 savings = int(total_est * 0.14)
 
-                st.markdown(f"### 🎯 Autonomous Procurement Plan ({language})")
+                st.markdown(f"### 🎯 Recommended Procurement Plan ({language})")
                 st.table(pd.DataFrame([
-                    {"Category": "Seeds", "Recommended Product": "Hybrid Certified Seeds", "Quantity": f"{ac * 3} kg", "Est. Cost (INR)": f"₹{seed_cost:,}"},
-                    {"Category": "Bio-Fertilizer", "Recommended Product": "Bio-NPK Liquid + Neem Cake", "Quantity": f"{ac * 5} L", "Est. Cost (INR)": f"₹{fert_cost:,}"},
-                    {"Category": "Crop Protection", "Recommended Product": "Organic Bio-Pesticide", "Quantity": f"{ac * 2} L", "Est. Cost (INR)": f"₹{pest_cost:,}"}
+                    {"Category": "Seeds", "Product": "Hybrid Certified Seeds", "Quantity": f"{ac * 3} kg", "Est. Cost": f"₹{seed_cost:,}"},
+                    {"Category": "Bio-Fertilizer", "Product": "Bio-NPK Liquid + Neem Cake", "Quantity": f"{ac * 5} L", "Est. Cost": f"₹{fert_cost:,}"},
+                    {"Category": "Crop Protection", "Product": "Organic Bio-Pesticide", "Quantity": f"{ac * 2} L", "Est. Cost": f"₹{pest_cost:,}"}
                 ]))
 
                 st.markdown(f"""
-                #### 🤖 Autonomous Actions Logged
-                1. **Bulk Grouping Discount:** Pooled demand across regional farms, saving 14% on wholesale seeds.
-                2. **Direct Logistics Lock:** Arranged direct delivery to village hub.
-                3. **Soil Optimization Match:** Adjusted NPK ratio specifically for **{st.session_state.farm_data['soil']}**.
-
-                **Total Procurement Cost:** ₹{total_est:,} *(Saved ₹{savings:,} vs standard retail)*
-                """)
+                <div class="glass-card" style="border-left: 4px solid #166534;">
+                    <h5 style="margin:0 0 10px 0; color: #166534;">🤖 Agent Execution Insights</h5>
+                    <ol style="margin:0; padding-left: 20px; color: #334155; font-size: 0.9rem;">
+                        <li><b>Bulk Grouping:</b> Aggregated orders with 12 nearby farms, cutting seed rates by 14%.</li>
+                        <li><b>Logistics Lock:</b> Scheduled zero-cost direct dispatch to your local village hub.</li>
+                        <li><b>Soil Match:</b> Formulated nitrogen ratio tailored to <b>{st.session_state.farm_data['soil']}</b>.</li>
+                    </ol>
+                    <hr style="margin: 12px 0;">
+                    <b>Total Calculated Cost:</b> ₹{total_est:,} <span class="pill-green">Saved ₹{savings:,}</span>
+                </div>
+                """, unsafe_allow_html=True)
             
             if enable_voice:
-                st.info("🔊 Audio Advisory Generated: Playing Voice Summary in selected language.")
+                st.info("🔊 **Audio Summary:** Playback active in selected language.")
 
 # ---------------- PAGE 2: MARKET INTELLIGENCE ----------------
 elif nav_selection == "📊 Market Intelligence":
-    st.subheader("Real-Time Mandi Price Trends & Buyer Demand")
+    st.subheader("📊 Price Trends & Forward Demand")
+    st.caption("Compare real-time benchmark Mandi prices against AgriMitra contract guarantees.")
     
-    m1, m2, m3 = st.columns(3)
-    with m1:
-        st.markdown('<div class="metric-card"><div class="metric-title">Current Mandi Rate</div><div class="metric-value">₹6,850/Qtl</div><span class="badge-green">+4.2% today</span></div>', unsafe_allow_html=True)
-    with m2:
-        st.markdown('<div class="metric-card"><div class="metric-title">AgriMitra Direct Buyer Rate</div><div class="metric-value">₹7,200/Qtl</div><span class="badge-blue">Direct Contract</span></div>', unsafe_allow_html=True)
-    with m3:
-        st.markdown('<div class="metric-card"><div class="metric-title">Estimated Yield Revenue</div><div class="metric-value">₹1,80,000</div><span class="badge-green">Net Positive</span></div>', unsafe_allow_html=True)
-        
-    st.write("### Price Trend Analysis")
     chart_data = pd.DataFrame({
         "Month": ["May", "Jun", "Jul", "Aug", "Sep", "Oct (Pred)"],
         "Mandi Benchmark (₹)": [6100, 6300, 6250, 6500, 6850, 6900],
         "AgriMitra Direct (₹)": [6400, 6600, 6600, 6900, 7200, 7350]
     }).set_index("Month")
+    
     st.line_chart(chart_data)
 
 # ---------------- PAGE 3: B2B MARKETPLACE ----------------
 elif nav_selection == "🛒 B2B Marketplace":
-    st.subheader("Verified Inputs & Direct Grain Contracts")
+    st.subheader("🛒 Direct B2B Commerce Hub")
     
-    tab_buy, tab_sell = st.tabs(["🛍️ Direct Input Procurement", "🌾 Sell Produce to Institutional Buyers"])
+    tab_buy, tab_sell = st.tabs(["🛍️ Procure Farm Inputs", "🌾 Institutional Buyer Orders"])
     
     with tab_buy:
-        st.write("Verified farm inputs from authorized distributors:")
         p1, p2, p3 = st.columns(3)
         with p1:
-            st.markdown('<div class="metric-card"><b>Bio-NPK Liquid Fertilizer (1L)</b><br><small>Vendor: IFFCO Agri Direct</small><br><h3>₹450</h3></div>', unsafe_allow_html=True)
-            st.button("Procure via Agent", key="buy1")
+            st.markdown('''
+                <div class="glass-card">
+                    <b>Bio-NPK Fertilizer (1L)</b><br>
+                    <small style="color:#64748b;">Vendor: IFFCO Direct</small>
+                    <h3 style="margin: 10px 0; color: #166534;">₹450</h3>
+                </div>
+            ''', unsafe_allow_html=True)
+            st.button("Order Now", key="b1", use_container_width=True)
         with p2:
-            st.markdown('<div class="metric-card"><b>Pigeon Pea Seeds (F1 Hybrid - 10kg)</b><br><small>Vendor: Mahyco Seeds</small><br><h3>₹2,100</h3></div>', unsafe_allow_html=True)
-            st.button("Procure via Agent", key="buy2")
+            st.markdown('''
+                <div class="glass-card">
+                    <b>Pigeon Pea Seeds (10kg)</b><br>
+                    <small style="color:#64748b;">Vendor: Mahyco Seeds</small>
+                    <h3 style="margin: 10px 0; color: #166534;">₹2,100</h3>
+                </div>
+            ''', unsafe_allow_html=True)
+            st.button("Order Now", key="b2", use_container_width=True)
         with p3:
-            st.markdown('<div class="metric-card"><b>Organic Neem Oil Extract (5L)</b><br><small>Vendor: Krishi Bio Labs</small><br><h3>₹1,250</h3></div>', unsafe_allow_html=True)
-            st.button("Procure via Agent", key="buy3")
+            st.markdown('''
+                <div class="glass-card">
+                    <b>Neem Oil Extract (5L)</b><br>
+                    <small style="color:#64748b;">Vendor: Krishi Bio Labs</small>
+                    <h3 style="margin: 10px 0; color: #166534;">₹1,250</h3>
+                </div>
+            ''', unsafe_allow_html=True)
+            st.button("Order Now", key="b3", use_container_width=True)
             
     with tab_sell:
-        st.write("Active institutional buyer purchase orders:")
         st.table(pd.DataFrame([
             {"Buyer": "AgriMills Ltd", "Required Qty": "50 Quintals", "Offered Rate": "₹7,250/Qtl", "Payment Term": "Instant (UPI)"},
             {"Buyer": "State Warehousing Corp", "Required Qty": "200 Quintals", "Offered Rate": "₹7,100/Qtl", "Payment Term": "3 Days Credit"},
@@ -228,7 +383,7 @@ elif nav_selection == "🛒 B2B Marketplace":
 
 # ---------------- PAGE 4: FARM SETTINGS ----------------
 elif nav_selection == "⚙️ Farm Profile Settings":
-    st.subheader("Configure Farm Profile")
+    st.subheader("⚙️ Farm Parameters Configuration")
     with st.form("settings_form"):
         loc = st.text_input("Region / Location", value=st.session_state.farm_data["location"])
         crp = st.text_input("Crop Type", value=st.session_state.farm_data["crop"])
@@ -236,7 +391,7 @@ elif nav_selection == "⚙️ Farm Profile Settings":
         sl = st.selectbox("Soil Type", ["Black Soil", "Red Soil", "Alluvial Soil", "Sandy Loam"], index=0)
         bg = st.number_input("Max Procurement Budget (₹)", value=st.session_state.farm_data["budget"])
         
-        save = st.form_submit_button("Save Farm Profile")
+        save = st.form_submit_button("Update Farm Profile", use_container_width=True)
         if save:
             st.session_state.farm_data = {"location": loc, "crop": crp, "acreage": ac, "soil": sl, "budget": bg}
-            st.success("✅ Farm Profile parameters updated successfully!")
+            st.success("✅ Farm Profile updated!")
