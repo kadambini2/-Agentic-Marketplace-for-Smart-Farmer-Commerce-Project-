@@ -2,7 +2,7 @@ import os
 import time
 import streamlit as st
 import pandas as pd
-from google import genai
+from google import genai  # Official google-genai package import
 
 # Page Configuration
 st.set_page_config(
@@ -12,19 +12,16 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS for App-Like UI/UX
+# Custom CSS for UI/UX Styling
 st.markdown("""
     <style>
-    /* Global styles */
     .stApp { background-color: #f8faf9; }
     
-    /* Custom Sidebar Styling */
     [data-testid="stSidebar"] {
         background-color: #ffffff;
         border-right: 1px solid #e0e0e0;
     }
     
-    /* Enterprise App Cards */
     .metric-card {
         background: white;
         padding: 20px;
@@ -38,11 +35,9 @@ st.markdown("""
     .badge-green { background: #dcfce7; color: #15803d; padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
     .badge-blue { background: #dbeafe; color: #1e40af; padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
 
-    /* Header Styling */
     .brand-title { font-size: 1.8rem; font-weight: 800; color: #166534; margin: 0; }
     .brand-subtitle { font-size: 0.95rem; color: #475569; }
     
-    /* Button Aesthetics */
     .stButton > button {
         background-color: #166534 !important;
         color: white !important;
@@ -58,11 +53,11 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Gemini Client Initialization
+# Safe Gemini Client Initialization
 def get_gemini_client():
     api_key = st.secrets.get("GEMINI_API_KEY") or os.environ.get("GEMINI_API_KEY")
     if not api_key:
-        st.error("⚠️ Gemini API Key missing. Add GEMINI_API_KEY to Streamlit Secrets.")
+        st.error("⚠️ Gemini API Key missing. Add GEMINI_API_KEY to your Streamlit secrets.")
         return None
     return genai.Client(GEMINI_API_KEY = "AIzaSy...")
 
@@ -72,7 +67,6 @@ with st.sidebar:
     st.markdown('<div class="brand-subtitle">Autonomous Farm Commerce</div>', unsafe_allow_html=True)
     st.divider()
 
-    # App Navigation Menu
     nav_selection = st.radio(
         "NAVIGATION",
         ["🤖 Agentic Advisor", "📊 Market Intelligence", "🛒 B2B Marketplace", "⚙️ Farm Profile Settings"],
@@ -80,18 +74,15 @@ with st.sidebar:
     )
 
     st.divider()
-    
-    # Unique Feature: Multi-Language & Voice Assistant Control
     st.markdown("##### 🌐 Voice & Localization")
     language = st.selectbox("Preferred Language", ["English", "Hindi (हिंदी)", "Kannada (ಕನ್ನಡ)", "Telugu (తెలుగు)"])
-    enable_voice = st.toggle("Enable Voice Output (TTS)", value=True)
+    enable_voice = st.toggle("Enable Voice Output", value=True)
     
     st.divider()
     st.caption("🟢 **Agent Node:** Online (v2.4-Production)")
 
-# ---------------- FARMER INPUT DATA STATE ----------------
-# Standard defaults stored in session state if not updated in settings
-if 'farm_data' not in st.state_dict():
+# ---------------- SESSION STATE DATA ----------------
+if 'farm_data' not in st.session_state:
     st.session_state.farm_data = {
         "location": "Karnataka (Kalaburagi)",
         "crop": "Pigeon Pea (Tur Dal)",
@@ -100,7 +91,7 @@ if 'farm_data' not in st.state_dict():
         "budget": 35000
     }
 
-# Top Header Layout Across All Navigation Pages
+# Top Header Layout
 top_c1, top_c2, top_c3 = st.columns([2, 1, 1])
 with top_c1:
     st.title(f"{nav_selection.split(' ')[1]} Overview")
@@ -111,7 +102,7 @@ with top_c3:
 
 st.divider()
 
-# ---------------- NAVIGATION PAGE 1: AGENTIC ADVISOR ----------------
+# ---------------- PAGE 1: AGENTIC ADVISOR ----------------
 if nav_selection == "🤖 Agentic Advisor":
     st.subheader("Autonomous Input Procurement & Budget Allocator")
     st.write("Our AI Agent coordinates input vendors, calculates chemical quantities by acreage, and locks direct wholesale prices.")
@@ -132,16 +123,14 @@ if nav_selection == "🤖 Agentic Advisor":
         if run_agent:
             client = get_gemini_client()
             if client:
-                # Execution Log Visual Component
                 status_box = st.status("🤖 Agent Executing Tasks...", expanded=True)
-                status_box.write("🔍 Scanning regional dealers in Kalaburagi radius...")
+                status_box.write("🔍 Scanning regional dealers in local radius...")
                 time.sleep(1)
                 status_box.write("⚖️ Negotiating bulk volume pricing for bio-fertilizers...")
                 time.sleep(1)
-                status_box.write("📦 Verifying NPK ratio suitability for Black Soil...")
+                status_box.write("📦 Verifying soil compatibility...")
                 status_box.update(label="✅ Agent Execution Complete!", state="complete", expanded=False)
 
-                # API Call
                 prompt = f"""
                 You are AgriMitra AI, an autonomous commerce agent for Indian agriculture.
                 Generate a precise procurement execution plan for a farmer with parameters:
@@ -152,12 +141,13 @@ if nav_selection == "🤖 Agentic Advisor":
                 - Budget: ₹{st.session_state.farm_data['budget']}
                 - Output Language: {language}
 
-                Format output as:
-                1. **Itemized Purchase Table** (Product Name, Category, Recommended Qty, Cost in INR).
-                2. **Negotiation Log**: 3 distinct actions taken by the agent (e.g., freight grouping, dealer discount applied).
+                Format output cleanly with Markdown:
+                1. **Itemized Purchase Table** (Product Name, Category, Quantity, Cost in INR).
+                2. **Negotiation Log**: 3 specific actions taken by the agent.
                 3. **Net Savings Summary**.
-                Keep response clear, structured, and practical.
                 """
+                
+                # Executing generate_content using the google-genai Client
                 response = client.models.generate_content(
                     model="gemini-2.5-flash",
                     contents=prompt
@@ -165,10 +155,9 @@ if nav_selection == "🤖 Agentic Advisor":
                 
                 st.markdown(response.text)
                 if enable_voice:
-                    st.audio("https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3", format="audio/mp3")
-                    st.caption("🔊 Audio Advisory Generated in selected language.")
+                    st.caption("🔊 Audio Advisory generated.")
 
-# ---------------- NAVIGATION PAGE 2: MARKET INTELLIGENCE ----------------
+# ---------------- PAGE 2: MARKET INTELLIGENCE ----------------
 elif nav_selection == "📊 Market Intelligence":
     st.subheader("Real-Time Mandi Price Trends & Buyer Demand")
     
@@ -180,7 +169,7 @@ elif nav_selection == "📊 Market Intelligence":
     with m3:
         st.markdown('<div class="metric-card"><div class="metric-title">Estimated Yield Revenue</div><div class="metric-value">₹1,80,000</div><span class="badge-green">Net Positive</span></div>', unsafe_allow_html=True)
         
-    st.write("### Price Trend Analysis (Last 6 Months)")
+    st.write("### Price Trend Analysis")
     chart_data = pd.DataFrame({
         "Month": ["May", "Jun", "Jul", "Aug", "Sep", "Oct (Pred)"],
         "Mandi Benchmark (₹)": [6100, 6300, 6250, 6500, 6850, 6900],
@@ -188,14 +177,14 @@ elif nav_selection == "📊 Market Intelligence":
     }).set_index("Month")
     st.line_chart(chart_data)
 
-# ---------------- NAVIGATION PAGE 3: B2B MARKETPLACE ----------------
+# ---------------- PAGE 3: B2B MARKETPLACE ----------------
 elif nav_selection == "🛒 B2B Marketplace":
     st.subheader("Verified Inputs & Direct Grain Contracts")
     
     tab_buy, tab_sell = st.tabs(["🛍️ Direct Input Procurement", "🌾 Sell Produce to Institutional Buyers"])
     
     with tab_buy:
-        st.write("Verified high-grade farm inputs from authorized distributors:")
+        st.write("Verified farm inputs from authorized distributors:")
         p1, p2, p3 = st.columns(3)
         with p1:
             st.markdown('<div class="metric-card"><b>Bio-NPK Liquid Fertilizer (1L)</b><br><small>Vendor: IFFCO Agri Direct</small><br><h3>₹450</h3></div>', unsafe_allow_html=True)
@@ -208,14 +197,14 @@ elif nav_selection == "🛒 B2B Marketplace":
             st.button("Buy Now", key="buy3")
             
     with tab_sell:
-        st.write("Bypassing intermediaries: Active buyer purchase orders nearby:")
+        st.write("Active institutional buyer purchase orders:")
         st.table(pd.DataFrame([
             {"Buyer": "AgriMills Ltd", "Required Qty": "50 Quintals", "Offered Rate": "₹7,250/Qtl", "Payment Term": "Instant (UPI)"},
             {"Buyer": "State Warehousing Corp", "Required Qty": "200 Quintals", "Offered Rate": "₹7,100/Qtl", "Payment Term": "3 Days Credit"},
             {"Buyer": "Global Pulse Traders", "Required Qty": "100 Quintals", "Offered Rate": "₹7,300/Qtl", "Payment Term": "Instant Transfer"}
         ]))
 
-# ---------------- NAVIGATION PAGE 4: FARM SETTINGS ----------------
+# ---------------- PAGE 4: FARM SETTINGS ----------------
 elif nav_selection == "⚙️ Farm Profile Settings":
     st.subheader("Configure Farm Profile")
     with st.form("settings_form"):
@@ -228,4 +217,4 @@ elif nav_selection == "⚙️ Farm Profile Settings":
         save = st.form_submit_button("Save Farm Profile")
         if save:
             st.session_state.farm_data = {"location": loc, "crop": crp, "acreage": ac, "soil": sl, "budget": bg}
-            st.success("✅ Profile parameters saved across application sessions!")
+            st.success("✅ Profile parameters updated!")
